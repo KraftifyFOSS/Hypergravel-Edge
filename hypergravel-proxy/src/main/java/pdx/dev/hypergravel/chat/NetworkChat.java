@@ -1,7 +1,7 @@
 package pdx.dev.hypergravel.chat;
 
-import media.gitm.hypergravel.proxy.HyperGravelProxy;
-import media.gitm.hypergravel.proxy.player.ConnectedPlayer;
+import pdx.dev.hypergravel.proxy.HyperGravelProxy;
+import pdx.dev.hypergravel.proxy.player.ConnectedPlayer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;

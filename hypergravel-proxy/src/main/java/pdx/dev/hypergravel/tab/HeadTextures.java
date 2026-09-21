@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import media.gitm.hypergravel.proxy.protocol.packet.GameProfile;
+import pdx.dev.hypergravel.proxy.protocol.packet.GameProfile;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

@@ -35,7 +35,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("media.gitm.hypergravel.proxy.HyperGravelBootstrap")
+    mainClass.set("pdx.dev.hypergravel.proxy.HyperGravelBootstrap")
     applicationDefaultJvmArgs = listOf(
         "-XX:+UseZGC",
         "-XX:+ZGenerational",
@@ -49,7 +49,7 @@ application {
 tasks.jar {
     manifest {
         attributes(
-            "Main-Class" to "media.gitm.hypergravel.proxy.HyperGravelBootstrap",
+            "Main-Class" to "pdx.dev.hypergravel.proxy.HyperGravelBootstrap",
             "Implementation-Title" to "HyperGravel",
             "Implementation-Version" to project.version,
             "Multi-Release" to "true",

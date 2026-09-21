@@ -6,8 +6,8 @@ import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.util.UUID;
 
-import media.gitm.hypergravel.proxy.HyperGravelProxy;
-import media.gitm.hypergravel.proxy.player.ConnectedPlayer;
+import pdx.dev.hypergravel.proxy.HyperGravelProxy;
+import pdx.dev.hypergravel.proxy.player.ConnectedPlayer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

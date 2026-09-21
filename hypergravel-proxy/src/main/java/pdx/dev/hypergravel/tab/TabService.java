@@ -11,13 +11,13 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import media.gitm.hypergravel.api.server.RegisteredServer;
-import media.gitm.hypergravel.proxy.HyperGravelProxy;
-import media.gitm.hypergravel.proxy.backend.HyperGravelServer;
-import media.gitm.hypergravel.proxy.player.ConnectedPlayer;
-import media.gitm.hypergravel.proxy.protocol.PacketType;
-import media.gitm.hypergravel.proxy.protocol.ProtocolState;
-import media.gitm.hypergravel.proxy.protocol.packet.GameProfile;
+import pdx.dev.hypergravel.api.server.RegisteredServer;
+import pdx.dev.hypergravel.proxy.HyperGravelProxy;
+import pdx.dev.hypergravel.proxy.backend.HyperGravelServer;
+import pdx.dev.hypergravel.proxy.player.ConnectedPlayer;
+import pdx.dev.hypergravel.proxy.protocol.PacketType;
+import pdx.dev.hypergravel.proxy.protocol.ProtocolState;
+import pdx.dev.hypergravel.proxy.protocol.packet.GameProfile;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -167,7 +167,7 @@ public final class TabService {
         sentRows.remove(player.uuid());
 
         player.currentHyperGravelServer().ifPresent(server -> {
-            for (media.gitm.hypergravel.api.player.Player other : server.players()) {
+            for (pdx.dev.hypergravel.api.player.Player other : server.players()) {
                 needsHide.put(other.uuid(), HIDE_REPEATS);
             }
         });

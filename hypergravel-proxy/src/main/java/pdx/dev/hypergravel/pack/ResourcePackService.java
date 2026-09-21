@@ -3,9 +3,9 @@ package pdx.dev.hypergravel.pack;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import media.gitm.hypergravel.proxy.HyperGravelProxy;
-import media.gitm.hypergravel.proxy.player.ConnectedPlayer;
-import media.gitm.hypergravel.proxy.protocol.PacketType;
+import pdx.dev.hypergravel.proxy.HyperGravelProxy;
+import pdx.dev.hypergravel.proxy.player.ConnectedPlayer;
+import pdx.dev.hypergravel.proxy.protocol.PacketType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.apache.logging.log4j.LogManager;
@@ -171,7 +171,7 @@ public final class ResourcePackService {
     private void pop(ConnectedPlayer player, UUID offer) {
         var connection = player.connection();
         if (!connection.active()
-                || connection.state() != media.gitm.hypergravel.proxy.protocol.ProtocolState.PLAY
+                || connection.state() != pdx.dev.hypergravel.proxy.protocol.ProtocolState.PLAY
                 || !connection.supports(PacketType.RESOURCE_PACK_POP)) {
             return;
         }
@@ -230,7 +230,7 @@ public final class ResourcePackService {
         
         
         if (!connection.active()
-                || connection.state() != media.gitm.hypergravel.proxy.protocol.ProtocolState.PLAY
+                || connection.state() != pdx.dev.hypergravel.proxy.protocol.ProtocolState.PLAY
                 || !connection.supports(PacketType.RESOURCE_PACK_PUSH)) {
             return;
         }

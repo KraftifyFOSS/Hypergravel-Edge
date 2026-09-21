@@ -15,7 +15,7 @@ import com.viaversion.viaversion.platform.ViaDecodeHandler;
 import com.viaversion.viaversion.platform.ViaEncodeHandler;
 import io.netty.channel.Channel;
 import io.netty.util.AttributeKey;
-import media.gitm.hypergravel.proxy.network.Connections;
+import pdx.dev.hypergravel.proxy.network.Connections;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

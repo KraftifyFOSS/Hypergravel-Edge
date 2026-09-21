@@ -3,7 +3,7 @@ plugins {
 }
 
 allprojects {
-    group = "media.gitm.hypergravel"
+    group = "pdx.dev.hypergravel"
     version = "0.1.0-SNAPSHOT"
 }
 

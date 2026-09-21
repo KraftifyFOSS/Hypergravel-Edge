@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.logging.Logger;
 
 import com.viaversion.viaversion.platform.UserConnectionViaVersionPlatform;
-import media.gitm.hypergravel.proxy.HyperGravelProxy;
+import pdx.dev.hypergravel.proxy.HyperGravelProxy;
 
 final class HyperGravelViaPlatform extends UserConnectionViaVersionPlatform {
 

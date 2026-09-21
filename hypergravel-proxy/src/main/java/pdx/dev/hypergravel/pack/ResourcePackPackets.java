@@ -3,11 +3,11 @@ package pdx.dev.hypergravel.pack;
 import java.util.UUID;
 
 import io.netty.buffer.ByteBuf;
-import media.gitm.hypergravel.proxy.protocol.ComponentNbt;
-import media.gitm.hypergravel.proxy.protocol.Packet;
-import media.gitm.hypergravel.proxy.protocol.PacketHandler;
-import media.gitm.hypergravel.proxy.protocol.ProtocolUtils;
-import media.gitm.hypergravel.proxy.protocol.ProtocolVersion;
+import pdx.dev.hypergravel.proxy.protocol.ComponentNbt;
+import pdx.dev.hypergravel.proxy.protocol.Packet;
+import pdx.dev.hypergravel.proxy.protocol.PacketHandler;
+import pdx.dev.hypergravel.proxy.protocol.ProtocolUtils;
+import pdx.dev.hypergravel.proxy.protocol.ProtocolVersion;
 import net.kyori.adventure.text.Component;
 
 public final class ResourcePackPackets {
