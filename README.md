@@ -7,6 +7,11 @@
 [![GitHub license](https://img.shields.io/github/license/KraftifyFOSS/Hypergravel-Edge?style=for-the-badge)](https://github.com/KraftifyFOSS/Hypergravel-Edge/blob/main/LICENSE)
 [![GitHub last commit](https://img.shields.io/github/last-commit/KraftifyFOSS/Hypergravel-Edge?style=for-the-badge&label=last%20commit)](https://github.com/KraftifyFOSS/Hypergravel-Edge/commits/main)
 
+<p align="center">
+  ![HyperGravel logo](assets/logo.png)</p>
+<p align="center">
+  ![HyperGravel banner](assets/banner.png)</p>
+
 A Minecraft: Java Edition reverse proxy. Fronts every Paper backend behind one
 address, authenticates players once, and moves them between backends without a
 re-login.
