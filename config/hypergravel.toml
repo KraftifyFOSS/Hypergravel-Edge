@@ -1,0 +1,198 @@
+
+
+
+
+
+
+
+
+[bind]
+host = "0.0.0.0"
+port = 25565
+
+
+online-mode = true          
+
+[network]
+
+worker-threads = 0          
+
+
+compression-threshold = 256
+compression-level = 6
+max-packet-size = 2097152
+
+
+max-uncompressed-size = 8388608
+handshake-timeout = "10s"
+read-timeout = "30s"
+connect-timeout = "5s"
+keepalive-interval = "15s"
+tcp-nodelay = true
+
+
+prefer-io-uring = false     
+write-buffer-low = 32768
+write-buffer-high = 65536
+
+[status]
+
+motd = "  <gradient:#a78bfa:#f472b6:#fb923c><bold>HyperGravel Network</bold></gradient> <dark_gray>»<gray> change me in hypergravel.toml\n  <color:#8a8fa0>a <gradient:#a78bfa:#fb923c><bold>HyperGravel</bold></gradient> proxy <dark_gray>·<color:#8a8fa0> fast, seamless, yours"
+max-players = 1000
+show-real-player-count = true
+sample = [
+    "<gradient:#a78bfa:#fb923c><bold>HyperGravel</bold></gradient>",
+    "<dark_gray>» <gray>edit [status] in hypergravel.toml",
+]
+version-name = "HyperGravel"
+favicon = "server-icon.png"
+enforce-secure-chat = false
+
+[forwarding]
+
+
+mode = "velocity-modern"
+
+
+secret = "CHANGE-ME-BEFORE-STARTING"    
+bungeeguard-token = ""
+
+[servers.hub]
+address = "127.0.0.1:25560"
+
+[servers.survival]
+address = "127.0.0.1:25561"
+on-down = "hub"
+
+[servers.event]
+address = "127.0.0.1:25562"
+restricted = true
+on-down = "hub"
+
+[servers.beta]
+address = "127.0.0.1:25563"
+permission = "hypergravel.server.beta"
+restricted = true
+on-down = "hub"
+
+[servers.art]
+address = "127.0.0.1:25564"
+restricted = true
+on-down = "hub"
+
+[servers.banned]
+address = "127.0.0.1:25600"
+limbo = true
+
+[servers.updating]
+address = "127.0.0.1:25601"
+limbo = true
+
+[routing]
+
+try = ["hub"]
+
+fallback = "hub"
+
+limbo = "updating"
+
+[limits]
+
+max-players = 0
+max-connections-per-ip = 8
+connections-per-second-per-ip = 8
+logins-per-second-per-ip = 3
+global-connections-per-second = 2000
+maintenance = false
+maintenance-allowlist = []
+
+[proxy-protocol]
+
+
+enabled = true
+
+
+required = false
+
+
+
+trusted = [
+    "127.0.0.1/32",
+    "::1/128",
+]
+
+[ops]
+metrics-enabled = true
+metrics-host = "127.0.0.1"  
+metrics-port = 9100         
+
+pack-editor-url = ""         
+
+shutdown-grace = "30s"
+health-check-interval = "5s"
+health-check-failures-to-down = 3
+
+
+restore-per-second = 20
+
+[via]
+
+
+
+enabled = true
+
+
+
+server-version = "auto"
+
+[pack]
+
+
+
+enabled = false
+url = ""
+
+
+sha1 = ""
+
+
+required = false
+
+prompt = ""
+
+build = true
+file = ""
+
+
+
+delay = "1s"
+
+
+kick-on-decline = false
+
+
+notice = ""
+
+
+background-ascent = 9
+
+[voice]
+
+
+
+
+enabled = false             
+
+port = 24530                
+
+bind = ""                   
+
+
+
+
+host = ""
+
+
+advertise-port = 0
+
+allow-pings = true

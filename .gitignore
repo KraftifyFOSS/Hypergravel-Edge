@@ -1,0 +1,16 @@
+# Build output
+build/
+.gradle/
+out/
+*.class
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+
+# Logs
+logs/
+*.log
+
+# Editor / OS
+.idea/
+*.iml
+.DS_Store

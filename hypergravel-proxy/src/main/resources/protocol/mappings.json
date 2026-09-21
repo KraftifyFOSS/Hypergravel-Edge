@@ -1,0 +1,437 @@
+{
+  "_comment": [
+    "Packet id mappings, keyed by state and direction.",
+    "",
+    "Each entry is a list of {from, id} ranges. 'from' is the protocol version at",
+    "which that id takes effect; it stays in effect until the next range starts.",
+    "Only packets HyperGravel actually decodes appear here \u2014 everything absent is",
+    "forwarded as an opaque slice, which is most of PLAY.",
+    "",
+    "HANDSHAKE, STATUS, LOGIN and CONFIGURATION ids have been stable across the",
+    "supported range and are reliable.",
+    "",
+    "PLAY ids shift nearly every release and MUST be verified against a generated",
+    "protocol dump before production \u2014 see docs/PROTOCOL.md. A wrong id here does",
+    "not corrupt the stream (the decoder falls back to raw forwarding on any decode",
+    "failure) but it does silently disable the corresponding interception, so",
+    "verify rather than assume.",
+    "",
+    "Protocol versions: 764=1.20.2 765=1.20.3 766=1.20.5 767=1.21 768=1.21.2",
+    "769=1.21.4 770=1.21.5 771=1.21.6 772=1.21.7 773=1.21.9 774=1.21.11 776=26.2",
+    "",
+    "'encodeOnly' marks a packet the proxy writes but never wants to read. It is",
+    "left out of the id lookup table, so a backend sending one stays on the raw",
+    "passthrough path instead of being decoded and re-encoded for nothing.",
+    "",
+    "Ids at 776 were checked against ViaVersion's own packet tables, which are the",
+    "same tables the translation layer uses."
+  ],
+  "HANDSHAKE": {
+    "SERVERBOUND": {
+      "handshake": [
+        {
+          "from": 0,
+          "id": 0
+        }
+      ]
+    }
+  },
+  "STATUS": {
+    "SERVERBOUND": {
+      "status_request": [
+        {
+          "from": 0,
+          "id": 0
+        }
+      ],
+      "status_ping": [
+        {
+          "from": 0,
+          "id": 1
+        }
+      ]
+    },
+    "CLIENTBOUND": {
+      "status_response": [
+        {
+          "from": 0,
+          "id": 0
+        }
+      ],
+      "status_ping": [
+        {
+          "from": 0,
+          "id": 1
+        }
+      ]
+    }
+  },
+  "LOGIN": {
+    "SERVERBOUND": {
+      "login_start": [
+        {
+          "from": 0,
+          "id": 0
+        }
+      ],
+      "login_encryption_response": [
+        {
+          "from": 0,
+          "id": 1
+        }
+      ],
+      "login_plugin_response": [
+        {
+          "from": 0,
+          "id": 2
+        }
+      ],
+      "login_acknowledged": [
+        {
+          "from": 764,
+          "id": 3
+        }
+      ]
+    },
+    "CLIENTBOUND": {
+      "login_disconnect": [
+        {
+          "from": 0,
+          "id": 0
+        }
+      ],
+      "login_encryption_request": [
+        {
+          "from": 0,
+          "id": 1
+        }
+      ],
+      "login_success": [
+        {
+          "from": 0,
+          "id": 2
+        }
+      ],
+      "login_set_compression": [
+        {
+          "from": 0,
+          "id": 3
+        }
+      ],
+      "login_plugin_request": [
+        {
+          "from": 0,
+          "id": 4
+        }
+      ]
+    }
+  },
+  "CONFIGURATION": {
+    "SERVERBOUND": {
+      "plugin_message": [
+        {
+          "from": 764,
+          "id": 1
+        },
+        {
+          "from": 766,
+          "id": 2
+        }
+      ],
+      "ack_finish_configuration": [
+        {
+          "from": 764,
+          "id": 2
+        },
+        {
+          "from": 766,
+          "id": 3
+        }
+      ],
+      "keep_alive": [
+        {
+          "from": 764,
+          "id": 3
+        },
+        {
+          "from": 766,
+          "id": 4
+        }
+      ]
+    },
+    "CLIENTBOUND": {
+      "plugin_message": [
+        {
+          "from": 764,
+          "id": 0
+        },
+        {
+          "from": 766,
+          "id": 1
+        }
+      ],
+      "disconnect": [
+        {
+          "from": 764,
+          "id": 1
+        },
+        {
+          "from": 766,
+          "id": 2
+        }
+      ],
+      "finish_configuration": [
+        {
+          "from": 764,
+          "id": 2
+        },
+        {
+          "from": 766,
+          "id": 3
+        }
+      ],
+      "keep_alive": [
+        {
+          "from": 764,
+          "id": 3
+        },
+        {
+          "from": 766,
+          "id": 4
+        }
+      ],
+      "transfer": [
+        {
+          "from": 766,
+          "id": 11
+        }
+      ]
+    }
+  },
+  "PLAY": {
+    "SERVERBOUND": {
+      "chat_command": [
+        {
+          "from": 764,
+          "id": 4
+        },
+        {
+          "from": 766,
+          "id": 5
+        },
+        {
+          "from": 776,
+          "id": 7
+        }
+      ],
+      "chat_command_signed": [
+        {
+          "from": 776,
+          "id": 8
+        }
+      ],
+      "chat_message": [
+        {
+          "from": 764,
+          "id": 5
+        },
+        {
+          "from": 766,
+          "id": 6
+        },
+        {
+          "from": 776,
+          "id": 9
+        }
+      ],
+      "ack_finish_configuration": [
+        {
+          "from": 764,
+          "id": 11
+        },
+        {
+          "from": 766,
+          "id": 12
+        },
+        {
+          "from": 776,
+          "id": 16
+        }
+      ],
+      "plugin_message": [
+        {
+          "from": 764,
+          "id": 20
+        },
+        {
+          "from": 766,
+          "id": 21
+        },
+        {
+          "from": 776,
+          "id": 22
+        }
+      ],
+      "keep_alive": [
+        {
+          "from": 764,
+          "id": 21
+        },
+        {
+          "from": 766,
+          "id": 24
+        },
+        {
+          "from": 776,
+          "id": 28
+        }
+      ],
+      "command_suggestion": [
+        {
+          "from": 776,
+          "id": 15
+        }
+      ],
+      "resource_pack_response": [
+        {
+          "from": 776,
+          "id": 49
+        }
+      ]
+    },
+    "CLIENTBOUND": {
+      "plugin_message": [
+        {
+          "from": 764,
+          "id": 24
+        },
+        {
+          "from": 766,
+          "id": 25
+        },
+        {
+          "from": 776,
+          "id": 24
+        }
+      ],
+      "commands": [
+        {
+          "from": 776,
+          "id": 16
+        }
+      ],
+      "command_suggestions": [
+        {
+          "from": 776,
+          "id": 15
+        }
+      ],
+      "system_chat": [
+        {
+          "from": 776,
+          "id": 121
+        }
+      ],
+      "disconnect": [
+        {
+          "from": 764,
+          "id": 27
+        },
+        {
+          "from": 766,
+          "id": 29
+        },
+        {
+          "from": 776,
+          "id": 32
+        }
+      ],
+      "keep_alive": [
+        {
+          "from": 764,
+          "id": 36
+        },
+        {
+          "from": 766,
+          "id": 38
+        },
+        {
+          "from": 776,
+          "id": 44
+        }
+      ],
+      "join_game": [
+        {
+          "from": 764,
+          "id": 41
+        },
+        {
+          "from": 766,
+          "id": 43
+        },
+        {
+          "from": 776,
+          "id": 49
+        }
+      ],
+      "start_configuration": [
+        {
+          "from": 764,
+          "id": 101
+        },
+        {
+          "from": 766,
+          "id": 105
+        },
+        {
+          "from": 776,
+          "id": 118
+        }
+      ],
+      "transfer": [
+        {
+          "from": 766,
+          "id": 115
+        },
+        {
+          "from": 776,
+          "id": 129
+        }
+      ],
+      "player_info_update": [
+        {
+          "from": 776,
+          "id": 70,
+          "encodeOnly": true
+        }
+      ],
+      "player_info_remove": [
+        {
+          "from": 776,
+          "id": 69,
+          "encodeOnly": true
+        }
+      ],
+      "tab_list": [
+        {
+          "from": 776,
+          "id": 122
+        }
+      ],
+      "resource_pack_pop": [
+        {
+          "from": 776,
+          "id": 80,
+          "encodeOnly": true
+        }
+      ],
+      "resource_pack_push": [
+        {
+          "from": 776,
+          "id": 81,
+          "encodeOnly": true
+        }
+      ]
+    }
+  }
+}

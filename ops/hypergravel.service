@@ -1,0 +1,42 @@
+[Unit]
+Description=HyperGravel — Placement network proxy
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=hypergravel
+Group=hypergravel
+WorkingDirectory=/opt/hypergravel
+
+# SIGTERM starts the drain: stop accepting, move players to limbo, then exit.
+# TimeoutStopSec must exceed ops.shutdown-grace or systemd will SIGKILL mid-drain.
+KillSignal=SIGTERM
+TimeoutStopSec=60
+
+ExecStart=/usr/bin/java \
+    -XX:+UseZGC \
+    -XX:+ZGenerational \
+    -Xms2G -Xmx2G \
+    -XX:MaxDirectMemorySize=2G \
+    -Dio.netty.allocator.type=pooled \
+    -Dio.netty.leakDetection.level=disabled \
+    -Dlog4j2.contextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector \
+    --enable-native-access=ALL-UNNAMED \
+    -jar /opt/hypergravel/hypergravel.jar /opt/hypergravel/config
+
+Restart=on-failure
+RestartSec=5s
+
+# The proxy needs a lot of sockets: one per player plus one per backend leg.
+LimitNOFILE=131072
+
+# It reads its config and writes its logs. Nothing else.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/hypergravel/logs
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Async loggers throughout: a log call on an event loop must never block on disk.
+  The disruptor-backed AsyncLoggerContextSelector is enabled via a system property
+  in the launch args; this config works either way.
+-->
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout
+                pattern="%d{HH:mm:ss.SSS} %highlight{%-5level} %style{[%t]}{cyan} %style{%logger{1}}{blue}: %msg%n%throwable"/>
+        </Console>
+
+        <RollingFile name="File" fileName="logs/hypergravel.log"
+                     filePattern="logs/hypergravel-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="%d{ISO8601} %-5level [%t] %logger{36}: %msg%n%throwable"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="14"/>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <!-- Netty is chatty at DEBUG and none of it is ours. -->
+        <Logger name="io.netty" level="INFO"/>
+
+        <Root level="INFO">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
+        </Root>
+    </Loggers>
+</Configuration>
