@@ -1,0 +1,7 @@
+.git
+build
+.gradle
+logs
+site
+*.log
+*.md

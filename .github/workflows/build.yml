@@ -69,6 +69,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      packages: write
     steps:
       - uses: actions/checkout@v4
 
@@ -82,6 +83,16 @@ jobs:
       - name: Build runnable fat jar
         run: ./gradlew --no-daemon build
 
+      - name: Publish API to GitHub Packages
+        run: ./gradlew --no-daemon :hypergravel-api:publishAllPublicationsToGitHubPackagesRepository
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Strip -SNAPSHOT from the fat jar for release
+        run: |
+          asset=$(ls hypergravel-proxy/build/libs/hypergravel-proxy-*-all.jar)
+          mv "$asset" "hypergravel-proxy/build/libs/hypergravel-proxy-${GITHUB_REF_NAME#v}-all.jar"
+
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -89,3 +100,66 @@ jobs:
           gh release create "$GITHUB_REF_NAME" --generate-notes || true
           gh release upload "$GITHUB_REF_NAME" \
             hypergravel-proxy/build/libs/hypergravel-proxy-*-all.jar --clobber
+
+  docker:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+          cache: gradle
+
+      - name: Build runnable fat jar
+        run: ./gradlew --no-daemon build
+
+      - name: Log in to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:${{ github.ref_name }}
+            ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:latest
+
+  docs:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+          cache: gradle
+
+      - name: Generate API javadoc
+        run: ./gradlew --no-daemon :hypergravel-api:javadoc
+
+      - name: Deploy javadoc to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ github.token }}
+          publish_dir: hypergravel-api/build/docs/javadoc
+          publish_branch: gh-pages
+          force_orphan: true

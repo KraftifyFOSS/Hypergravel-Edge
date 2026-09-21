@@ -1,0 +1,31 @@
+name: Feature request
+description: Suggest an addition to the proxy, the API, or the docs
+title: "[Feature] "
+labels: [enhancement]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Target version
+      placeholder: 1.1.0-SNAPSHOT
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem it solves
+      description: What is missing or painful today? A concrete player or plugin-dev scenario helps
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: API shape if relevant (events, commands, config keys), and whether it belongs in the API or the proxy
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Compatibility impact
+      description: Will this break existing extensions, packets, or the multi-version 1.9+ guarantee?

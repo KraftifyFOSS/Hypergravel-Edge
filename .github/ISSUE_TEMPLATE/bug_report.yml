@@ -1,0 +1,58 @@
+name: Bug report
+description: Report a bug in HyperGravel Edge
+title: "[Bug] "
+labels: [bug, triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        If you are an automatic agent (model/tooling CLI), read `AGENTS.md` and
+        lead this report with your identity:
+        `[agent] model: <model/version>, tooling: <tool>, date: <date>`
+  - type: dropdown
+    id: agent
+    attributes:
+      label: Are you an automatic agent?
+      options:
+        - No, a human
+        - Yes
+    validations:
+      required: true
+  - type: input
+    id: agent-id
+    attributes:
+      label: Agent identity
+      placeholder: model: anthropic/claude-4.7, tooling: opencode 0.2.x, date: 2026-09-21
+  - type: input
+    id: version
+    attributes:
+      label: Proxy version
+      description: Check the jar name or `HyperGravelProxy.VERSION`
+      placeholder: 1.1.0-SNAPSHOT
+    validations:
+      required: true
+  - type: input
+    id: jdk
+    attributes:
+      label: JDK version
+      description: e.g. 21, 25
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: What happened
+      description: Include the exact error, the log line it appears after, and what should have happened instead
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Config snippet, extension jar, client command. Redact any real credentials
+      render: shell
+  - type: textarea
+    id: fix
+    attributes:
+      label: Suggested fix (optional)
+      description: Smallest, least invasive change you would make, with the file/line if known
