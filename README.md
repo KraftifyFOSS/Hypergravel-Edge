@@ -1,8 +1,4 @@
 <p align="center">
-  <img src="assets/logo.png" alt="HyperGravel logo">
-</p>
-
-<p align="center">
   <img src="assets/banner.png" alt="HyperGravel banner">
 </p>
 
