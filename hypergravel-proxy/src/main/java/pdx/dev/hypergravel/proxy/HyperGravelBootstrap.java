@@ -298,6 +298,16 @@ public final class HyperGravelBootstrap {
             opsServer.start(config.ops().metricsHost(), config.ops().metricsPort());
         }
 
+        if (config.extensions().enabled()) {
+            Path extensionDirectory = configDirectory.resolve(config.extensions().directory());
+            var extensionManager = new pdx.dev.hypergravel.proxy.extension.ExtensionManager(
+                    proxy, extensionDirectory,
+                    configDirectory.resolve("extensions"),
+                    HyperGravelProxy.class.getClassLoader());
+            proxy.setExtensionManager(extensionManager);
+            extensionManager.enableAll();
+        }
+
         proxy.eventManager().fireAndForget(new ProxyInitializeEvent(proxy));
 
         OpsServer finalOpsServer = opsServer;
@@ -354,6 +364,11 @@ public final class HyperGravelBootstrap {
 
         if (opsServer != null) {
             opsServer.stop();
+        }
+
+        var extensionManager = proxy.extensionManager();
+        if (extensionManager != null) {
+            extensionManager.disableAll();
         }
 
         if (proxy.voice() != null) {

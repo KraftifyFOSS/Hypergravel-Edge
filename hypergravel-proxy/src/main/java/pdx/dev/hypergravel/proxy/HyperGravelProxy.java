@@ -70,6 +70,7 @@ public final class HyperGravelProxy implements ProxyServer {
     private final EncryptionManager encryption = new EncryptionManager();
     private final ChannelRegistry channels = new ChannelRegistry();
     private final Messenger messenger = new Messenger();
+    private volatile pdx.dev.hypergravel.proxy.extension.ExtensionManager extensionManager;
 
     private final AtomicReference<PermissionProvider> permissions =
             new AtomicReference<>(PermissionProvider.DEFAULT);
@@ -260,6 +261,14 @@ public final class HyperGravelProxy implements ProxyServer {
         return channels;
     }
 
+    public void setExtensionManager(pdx.dev.hypergravel.proxy.extension.ExtensionManager manager) {
+        this.extensionManager = manager;
+    }
+
+    public pdx.dev.hypergravel.proxy.extension.ExtensionManager extensionManager() {
+        return extensionManager;
+    }
+
     public Messenger messenger() {
         return messenger;
     }
@@ -329,6 +338,21 @@ public final class HyperGravelProxy implements ProxyServer {
     @Override
     public void shutdown(Component reason) {
         HyperGravelBootstrap.requestShutdown(this, reason);
+    }
+
+    @Override
+    public void registerPluginChannel(String channel) {
+        channels.register(channel);
+    }
+
+    @Override
+    public void unregisterPluginChannel(String channel) {
+        channels.unregister(channel);
+    }
+
+    @Override
+    public boolean isPluginChannelRegistered(String channel) {
+        return channels.isRegistered(channel);
     }
 
     public void registerBuiltinCommands() {

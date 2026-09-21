@@ -49,5 +49,11 @@ public interface ProxyServer {
         audience().sendMessage(message);
     }
 
+    void registerPluginChannel(String channel);
+
+    void unregisterPluginChannel(String channel);
+
+    boolean isPluginChannelRegistered(String channel);
+
     void shutdown(Component reason);
 }

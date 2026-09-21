@@ -1,3 +1,8 @@
+plugins {
+    `java-library`
+    `maven-publish`
+}
+
 dependencies {
     api(platform(libs.junit.bom))
 
@@ -9,4 +14,18 @@ dependencies {
 
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly(libs.junit.platform.launcher)
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("hypergravelApi") {
+            from(components["java"])
+            artifactId = "hypergravel-api"
+            pom {
+                name.set("HyperGravel API")
+                description.set("API for server-side proxy plugins (extensions) on HyperGravel Edge")
+                url.set("https://github.com/KraftifyFOSS/Hypergravel-Edge")
+            }
+        }
+    }
 }

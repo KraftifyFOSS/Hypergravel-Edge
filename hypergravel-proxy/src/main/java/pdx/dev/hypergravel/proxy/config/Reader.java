@@ -14,6 +14,10 @@ public final class Reader implements ConfigSection {
 
     private static final Config EMPTY = Config.of(InMemoryFormat.defaultInstance());
 
+    public static Reader ofEmpty(String path) {
+        return new Reader(EMPTY, path);
+    }
+
     private final Config config;
     private final String path;
 

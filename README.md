@@ -47,6 +47,10 @@ reasoning behind it.
 * **Network chat** - cross-server chat relay over the plugin channel.
 * **Login queue** - a queue service that parks players while the destination
   backend is at capacity.
+* **Extensions** - a plugin API (`hypergravel-api`) plus a loader that scans
+  `extensions/` for jars, isolates each in its own classloader, sorts by
+  declared dependencies, and drives `onEnable`/`onDisable`. The built-in pack,
+  tab, chat and queue services sit on the same API.
 
 ## Status
 
@@ -60,11 +64,11 @@ reasoning behind it.
 | Zero-copy PLAY passthrough                           | Done   |
 | Health monitor + fallback on backend loss            | Done   |
 | Multi-version: 1.9 → backend version, proxy-side Via | Done   |
-| Voice relay, pack builder/editor, tab, chat, queue   | Done   |
+| Voice relay, pack builder/editor, tab, chat, queue    | Done   |
+| Extensions (`extensions/` scanning, deps, lifecycle)  | Done   |
 
 **Not yet:** system chat to players (`HyperGravelProxy.Messenger` logs and drops
-until the PLAY-state ids are verified), `extensions/` directory scanning, and
-Bedrock/Floodgate support.
+until the PLAY-state ids are verified), and Bedrock/Floodgate support.
 
 ### The one thing to verify before production
 
@@ -176,6 +180,32 @@ wherever they now are.
 Messages on this channel are accepted **only from backends**. A client that sends
 one is dropped, so a player cannot move themselves or anyone else.
 
+## Extensions (server-side plugins)
+
+HyperGravel loads your proxy plugins from the `extensions/` directory at
+startup. A plugin is a jar with one `@Extension`-annotated class extending
+`HyperGravelExtension`; the proxy gives it the full `ProxyServer` API —
+commands, events, scheduler, per-extension config, plugin channels — and sorts
+enabled extensions by their declared dependencies. A broken one is skipped,
+never fatal.
+
+```java
+@Extension(id = "sample-hello", name = "Sample Greeter", version = "1.0.0")
+public final class HelloExtension extends HyperGravelExtension {
+
+    @Override public void onEnable() {
+        logger().info("Hello enabled on {}", proxy().version());
+        commandManager().register("hello", (source, args) ->
+                source.sendMessage(Component.text("Hello, " + source.name())));
+    }
+}
+```
+
+See [`docs/EXTENSIONS.md`](docs/EXTENSIONS.md) for the full plugin-dev guide,
+and [`examples/sample-extension`](examples/sample-extension) for a buildable
+skeleton. The API is published with `./gradlew :hypergravel-api:publishToMavenLocal`
+so plugin projects can depend on `pdx.dev.hypergravel:hypergravel-api`.
+
 ## Ops
 
 ```text
@@ -203,14 +233,16 @@ hypergravel-proxy/   the proxy
   backend/           server registry, connector, health monitor
   auth/              encryption, Mojang session verification
   forwarding/        Velocity modern, BungeeGuard, legacy
+  extension/         the plugin loader - jar scan, classloaders, dependency order
   pdx.dev.hypergravel/
     via/             protocol translation
     voice/           voice relay
     pack/            resource pack system
     tab/             tab list
     chat/            network chat
+examples/            sample-extension - a buildable plugin skeleton
 config/              example configuration
-docs/                architecture documentation
+docs/                architecture + extension API docs
 ops/                 systemd unit
 ```
 

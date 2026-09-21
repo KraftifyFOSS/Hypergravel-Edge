@@ -196,3 +196,11 @@ host = ""
 advertise-port = 0
 
 allow-pings = true
+
+[extensions]
+
+# Server-side plugins ("extensions"). Drop compiled jars into the directory
+# below; they are discovered at startup, sorted by their @Extension metadata,
+# and enabled in dependency order. A broken one is skipped, never fatal.
+enabled = true
+directory = "extensions"

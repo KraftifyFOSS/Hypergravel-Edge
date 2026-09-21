@@ -31,7 +31,8 @@ public record HyperGravelConfig(
         MultiVersion multiVersion,
         Tab tab,
         Pack pack,
-        Voice voice) {
+        Voice voice,
+        Extensions extensions) {
 
     public record Bind(String host, int port, boolean onlineMode) {
         public InetSocketAddress address() {
@@ -146,6 +147,8 @@ public record HyperGravelConfig(
             int healthCheckFailuresToDown,
             int restorePerSecond,
             String packEditorUrl) {}
+
+    public record Extensions(boolean enabled, String directory) {}
 
     public static HyperGravelConfig load(Path file) throws java.io.IOException {
         CommentedConfig raw;
@@ -307,9 +310,14 @@ public record HyperGravelConfig(
                 voiceSection.integer("advertise-port", 0),
                 voiceSection.bool("allow-pings", true));
 
+        Reader extensionsSection = root.section("extensions");
+        Extensions extensions = new Extensions(
+                extensionsSection.bool("enabled", true),
+                extensionsSection.string("directory", "extensions"));
+
         HyperGravelConfig config = new HyperGravelConfig(bind, network, status, forwarding,
                 servers, routing, limits, queue, proxyProtocol, opsConfig, commands, multiVersion,
-                tab, pack, voice);
+                tab, pack, voice, extensions);
         config.validate();
         return config;
     }
@@ -457,7 +465,10 @@ public record HyperGravelConfig(
 
                 || voice.enabled() != other.voice.enabled()
                 || voice.port() != other.voice.port()
-                || !voice.bindAddress().equals(other.voice.bindAddress());
+                || !voice.bindAddress().equals(other.voice.bindAddress())
+
+                || extensions.enabled() != other.extensions.enabled()
+                || !extensions.directory().equals(other.extensions.directory());
     }
 
     public static final class ConfigException extends RuntimeException {

@@ -284,23 +284,37 @@ Cost of a ping at steady state: one varint length prefix and a
 
 ## 9. Extension API (`hypergravel-api`)
 
-Annotation-driven, Velocity-shaped so our existing logic ports with minimal
-edits.
+Proxy plugins are *extensions*: jars in the configured `extensions/` directory,
+discovered by one `@Extension`-annotated class that extends
+`HyperGravelExtension`.
 
 ```java
 @Extension(id = "hypergravel", name = "HyperGravel Integrations", version = "1.0.0")
-public final class HyperGravelExtension {
-    @Inject ProxyServer proxy;
+public final class MyExtension extends HyperGravelExtension {
 
-    @Subscribe
-    void onPreConnect(PreServerConnectEvent event) {
-        if (event.target().name().equals("event") && !eventOpen) {
-            event.setResult(PreServerConnectEvent.Result.denied(
-                MiniMessage.miniMessage().deserialize("<red>The event is closed.")));
-        }
+    @Override
+    public void onEnable() {
+        eventManager().register(this, PreServerConnectEvent.class, event -> {
+            if (event.target().name().equals("event") && !eventOpen) {
+                event.setResult(PreServerConnectEvent.Result.denied(
+                    MiniMessage.miniMessage().deserialize("<red>The event is closed.")));
+            }
+        });
     }
 }
 ```
+
+`onEnable` runs last in startup, after every built-in service; the proxy instance
+is reachable as `proxy()`, with `logger()`, a per-extension `config()` from
+`extensions/<id>.toml`, and a mutable `dataDirectory()`.
+
+**Loading.** Each jar is scanned in its own `URLClassLoader` whose parent is the
+proxy classloader, so an extension sees the API and every proxy dependency but
+never another extension's classes. Extensions are topologically ordered by `depends`
+and disabled in reverse order; `softDepends` only tips the choice between ready
+candidates. A missing hard dependency, a cycle, a duplicate id, or an
+`onEnable` throw disables *that* extension only and is reported by name — the
+proxy always starts.
 
 **Events** - `ProxyInitializeEvent`, `ProxyShutdownEvent`, `LoginEvent`,
 `PreServerConnectEvent` (cancellable + redirectable), `ServerConnectedEvent`,
@@ -313,9 +327,11 @@ returns an `EventTask`, which suspends the event chain, runs on a virtual
 thread, and resumes on the original EventLoop. This is how a permission lookup
 or a webhook call participates in a cancellable event without stalling I/O.
 
-**Also provided:** command registration with Brigadier-style completion,
-`Scheduler` (delayed + repeating, virtual-thread backed), typed TOML config
-binding, and an optional `PermissionProvider` that LuckPerms can back.
+**Also provided:** command registration with completion, `Scheduler` (delayed +
+repeating, virtual-thread backed), typed TOML config binding, plugin channels,
+and an optional `PermissionProvider` that LuckPerms can back. Built-in services
+(pack, tab, chat, queue) are registered through the same `EventManager` as
+extensions, so ordering between them is uniform.
 
 ### Example integrations
 
