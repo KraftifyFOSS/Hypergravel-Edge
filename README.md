@@ -184,8 +184,8 @@ one is dropped, so a player cannot move themselves or anyone else.
 
 HyperGravel loads your proxy plugins from the `extensions/` directory at
 startup. A plugin is a jar with one `@Extension`-annotated class extending
-`HyperGravelExtension`; the proxy gives it the full `ProxyServer` API —
-commands, events, scheduler, per-extension config, plugin channels — and sorts
+`HyperGravelExtension`; the proxy gives it the full `ProxyServer` API -
+commands, events, scheduler, per-extension config, plugin channels - and sorts
 enabled extensions by their declared dependencies. A broken one is skipped,
 never fatal.
 

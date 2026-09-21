@@ -313,7 +313,7 @@ proxy classloader, so an extension sees the API and every proxy dependency but
 never another extension's classes. Extensions are topologically ordered by `depends`
 and disabled in reverse order; `softDepends` only tips the choice between ready
 candidates. A missing hard dependency, a cycle, a duplicate id, or an
-`onEnable` throw disables *that* extension only and is reported by name — the
+`onEnable` throw disables *that* extension only and is reported by name - the
 proxy always starts.
 
 **Events** - `ProxyInitializeEvent`, `ProxyShutdownEvent`, `LoginEvent`,

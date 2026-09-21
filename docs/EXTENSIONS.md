@@ -13,7 +13,7 @@ surface an extension can reach. There is a working example at
 ## 1. Project setup
 
 The API is published to Maven (and to your local repo with
-`./gradlew :hypergravel-api:publishToMavenLocal`). Add it as `compileOnly` —
+`./gradlew :hypergravel-api:publishToMavenLocal`). Add it as `compileOnly` -
 the running proxy provides it:
 
 ```kotlin
@@ -32,8 +32,8 @@ tasks.withType<JavaCompile>().configureEach { options.release.set(21) }
 ```
 
 * Use **Java 21+** (`options.release`). The proxy requires it.
-* A **thin jar is usually enough**: anything the proxy already has — Adventure,
-  MiniMessage, log4j — is visible at runtime for free. Only bundle third-party
+* A **thin jar is usually enough**: anything the proxy already has - Adventure,
+  MiniMessage, log4j - is visible at runtime for free. Only bundle third-party
   libraries you actually need, via the Shadow plugin, into the same jar.
 * Name the built artifact whatever you like; **the extension id comes from the
   annotation, not the filename**.
@@ -73,7 +73,7 @@ then:
 1. Loads every jar into its **own classloader** (parent = the proxy). Sibling
    extensions cannot see each other's classes; a broken jar cannot poison
    anything else.
-2. Resolves hard `depends` — a missing dependency marks **that** extension
+2. Resolves hard `depends` - a missing dependency marks **that** extension
    broken and skips it; the rest load.
 3. Topologically sorts so dependencies enable first. `softDepends` only tips
    the ordering a dependent prefers, it can never block.
@@ -110,7 +110,7 @@ public final class MyExtension extends HyperGravelExtension {
   still be connected. It runs before the scheduler and event loop groups are
   torn down, so cleanup can still send messages and cancel tasks.
 * The proxy fires `ProxyInitializeEvent` **after** enabling all extensions, and
-  `ProxyShutdownEvent` **before** disabling them — subscribe to those for
+  `ProxyShutdownEvent` **before** disabling them - subscribe to those for
   cross-extension coordination.
 * Extensions are **not** reloaded on a config reload. Enabling/disabling only
   happens at startup and shutdown; a chance to `[extensions]` settings tells you
@@ -125,16 +125,16 @@ Inside `onEnable` (and `onDisable`) the base class hands out everything:
 | Accessor | What it is |
 | --- | --- |
 | `proxy()` | The `ProxyServer`: players, servers, broadcasting, shutdown |
-| `logger()` | `Logger` named `ext-<id>` — your per-extension log4j logger |
+| `logger()` | `Logger` named `ext-<id>` - your per-extension log4j logger |
 | `config()` | `ConfigSection` of `<config-dir>/extensions/<id>.toml` |
 | `configDirectory()` | Where that toml lives (and where you may add more) |
-| `dataDirectory()` | `<config-dir>/extensions/<id>` — mutable state, created on enable |
+| `dataDirectory()` | `<config-dir>/extensions/<id>` - mutable state, created on enable |
 | `classLoader()` | Your extension's classloader |
 | `scheduler()` | `proxy().scheduler()`, pre-wired to your extension as owner |
 | `eventManager()` / `commandManager()` | Shortcuts to the shared registries |
 
 The owner passed to every `scheduler()` and `eventManager()` call should be
-**your extension instance** — that is what makes `scheduler().cancelAll(this)`
+**your extension instance** - that is what makes `scheduler().cancelAll(this)`
 and `eventManager().unregisterAll(this)` work on disable.
 
 ### 4.1 Per-extension config
@@ -151,7 +151,7 @@ String greeting = config().getString("greeting", "<gold>Welcome!</gold>");
 boolean fancy = config().getBoolean("fancy", false);
 ```
 
-If the file is absent (or unparsable) `config()` is an empty section — never
+If the file is absent (or unparsable) `config()` is an empty section - never
 null, and a bad file never stops the extension. The full `ConfigSection` API:
 `getString/getInt/getLong/getDouble/getBoolean/getDuration/getStringList`,
 `getSection`, `contains`, `keys`.
@@ -207,7 +207,7 @@ eventManager().register(this, new Listener());
 
 Dispatch is *inline on the EventLoop* for `void` handlers (the fast path). A
 handler that needs to block returns an `EventTask`: the chain suspends, the task
-runs on a virtual thread, and the chain resumes on the original event loop —
+runs on a virtual thread, and the chain resumes on the original event loop -
 that is how you do a webhook or a permission lookup inside a cancellable event
 without stalling I/O.
 
@@ -241,7 +241,7 @@ proxy().broadcast(MM.deserialize("<gold>The network greets you."));
 ```
 
 A player connection is held by the player's and the backend's EventLoops; do not
-call `connect`/`sendPluginMessage` from a foreign thread — go through the
+call `connect`/`sendPluginMessage` from a foreign thread - go through the
 `scheduler` or return an `EventTask`.
 
 ### 4.6 Plugin channels
@@ -256,7 +256,7 @@ boolean ok = proxy().isPluginChannelRegistered("my:channel");
 ```
 
 `sendPluginMessage` on `Player`/`RegisteredServer` uses the registry. Channels
-are **not** unregistered on disable — if that matters to you,
+are **not** unregistered on disable - if that matters to you,
 `proxy().unregisterPluginChannel("my:channel")` in `onDisable`.
 
 ### 4.7 Permissions
@@ -288,23 +288,23 @@ public final class Consumer extends HyperGravelExtension {
 ```
 
 Both get their own classloaders, so `api-lib` cannot expose classes the consumer
-compiles against — publish shared types through `hypergravel-api` or ship them
+compiles against - publish shared types through `hypergravel-api` or ship them
 in both jars.
 
 ---
 
 ## 6. Troubleshooting
 
-* **"annotated with @Extension but does not extend HyperGravelExtension"** —
+* **"annotated with @Extension but does not extend HyperGravelExtension"** -
   the class must extend the base class.
-* **"missing dependency 'x'"** — `depends` names an id no jar in the directory
+* **"missing dependency 'x'"** - `depends` names an id no jar in the directory
   declares.
-* **"dependency cycle in [...]"** — two extensions depend on each other; remove
+* **"dependency cycle in [...]"** - two extensions depend on each other; remove
   one edge.
-* **"extensions: N jar(s), N loaded, N enabled, M failed"** — M extensions were
+* **"extensions: N jar(s), N loaded, N enabled, M failed"** - M extensions were
   skipped; the line above names each one and why.
-* **Logs stop mid-shutdown** — that is log4j2's async logger draining during
+* **Logs stop mid-shutdown** - that is log4j2's async logger draining during
   JVM shutdown, not your `onDisable` failing (verify with a side effect in a
   file if you ever suspect it).
-* Extensions load **after** `ProxyInitializeEvent`? No — extensions enable
+* Extensions load **after** `ProxyInitializeEvent`? No - extensions enable
   first, so subscribing to `ProxyInitializeEvent` in `onEnable` always sees it.
