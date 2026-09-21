@@ -5,7 +5,7 @@ log4j = "2.26.1"
 gson = "2.14.0"
 nightconfig = "3.9.0"
 fastutil = "8.5.15"
-caffeine = "3.2.0"
+caffeine = "3.2.4"
 guava = "33.4.8-jre"
 junit = "5.11.4"
 
