@@ -92,7 +92,7 @@ public record HyperGravelConfig(
 
     public record MultiVersion(boolean enabled, String serverVersion) {}
 
-    public record Tab(boolean enabled, Duration refresh, Map<String, String> playerHeads,
+    public record Tab(boolean networkList, Duration refresh, Map<String, String> playerHeads,
                       String icons) {}
 
     public record Pack(boolean enabled, String url, String sha1, boolean required, String prompt,
@@ -267,7 +267,11 @@ public record HyperGravelConfig(
             playerHeads.put(name.toLowerCase(Locale.ROOT), headsSection.string(name, ""));
         }
         Tab tab = new Tab(
-                tabSection.bool("enabled", true),
+                tabSection.contains("network-list")
+                        ? tabSection.bool("network-list", false)
+                        : tabSection.contains("enabled")
+                        ? tabSection.bool("enabled", false)
+                        : false,
                 tabSection.duration("refresh", Duration.ofSeconds(1)),
                 Map.copyOf(playerHeads),
                 tabSection.string("icons", "both"));

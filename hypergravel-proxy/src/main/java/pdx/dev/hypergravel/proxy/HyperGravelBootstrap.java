@@ -126,7 +126,7 @@ public final class HyperGravelBootstrap {
         proxy.queue().start();
 
         var faces = new pdx.dev.hypergravel.tab.PlayerFaces(configDirectory.resolve("tab-faces"));
-        if (config.tab().enabled()) {
+        if (config.tab().networkList()) {
             faces.resolve(config.tab().playerHeads().entrySet().stream()
                     .filter(entry -> "face".equalsIgnoreCase(entry.getValue().trim()))
                     .map(java.util.Map.Entry::getKey)
@@ -199,7 +199,7 @@ public final class HyperGravelBootstrap {
         }
 
         pdx.dev.hypergravel.tab.TabService tab = null;
-        if (config.tab().enabled()) {
+        if (config.tab().networkList()) {
             tab = new pdx.dev.hypergravel.tab.TabService(
                     proxy, configDirectory.resolve("tab-heads.json"), config.tab().refresh(),
                     config.tab().playerHeads(), config.tab().icons(), faces);

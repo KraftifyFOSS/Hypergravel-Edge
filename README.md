@@ -42,8 +42,10 @@ reasoning behind it.
   with server-owned invite packets, so nobody needs a third-party voice plugin.
 * **Resource pack** - a pack builder (`pack/`) that renders the menu panels,
   tab icons, glyphs and backgrounds at runtime, plus a pack editor endpoint.
-* **Tab** - a server-driven tab list (`tab/`) with custom head icons, live
-  player sections and world cards.
+* **Tab** - the tab behaves like normal Minecraft by default (the backend
+  list is forwarded untouched); an opt-in server-driven network list (`tab/`)
+  with custom head icons, live player sections and world cards is available
+  via `[tab] network-list = true`.
 * **Network chat** - cross-server chat relay over the plugin channel.
 * **Login queue** - a queue service that parks players while the destination
   backend is at capacity.

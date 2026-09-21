@@ -28,6 +28,11 @@ multi-version 1.9+ guarantee.
 - Version bumped from `0.1.0-SNAPSHOT` to `1.1.0-SNAPSHOT`.
 - Release artifacts strip the `-SNAPSHOT` suffix: a `v1.1.0` tag produces
   `hypergravel-proxy-1.1.0-all.jar`.
+- Tab now behaves like normal Minecraft by default: the backend player list is
+  forwarded untouched. The server-driven network list is opt-in via
+  `[tab] network-list = true` (the legacy `enabled` key is still honored). When
+  the network list is on, backend player-info packets are dropped so the two
+  lists never collide.
 
 ### Fixed
 - Dependency ordering in the extension loader: stable Kahn ordering is no

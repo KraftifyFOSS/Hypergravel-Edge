@@ -176,6 +176,21 @@ notice = ""
 
 background-ascent = 9
 
+[tab]
+
+
+network-list = false
+
+# Opt-in server-driven tab list: when `network-list = true` the proxy hides
+# the backend player list and draws its own sections with custom head icons,
+# world cards and live player counts. Off by default, so the tab behaves
+# like normal Minecraft (backend list is forwarded untouched). The legacy
+# `enabled = true` key is still honored when `network-list` is absent.
+
+
+refresh = "1s"
+icons = "both"
+
 [voice]
 
 

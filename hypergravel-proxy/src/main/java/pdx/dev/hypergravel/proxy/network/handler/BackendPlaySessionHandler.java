@@ -7,6 +7,7 @@ import pdx.dev.hypergravel.proxy.backend.BackendConnection;
 import pdx.dev.hypergravel.proxy.network.SessionHandler;
 import pdx.dev.hypergravel.proxy.player.ConnectedPlayer;
 import pdx.dev.hypergravel.proxy.protocol.Packet;
+import pdx.dev.hypergravel.proxy.protocol.PacketType;
 import pdx.dev.hypergravel.proxy.protocol.ProtocolState;
 import pdx.dev.hypergravel.proxy.protocol.packet.CommandPackets;
 import pdx.dev.hypergravel.proxy.protocol.packet.PlayPackets;
@@ -30,11 +31,16 @@ public final class BackendPlaySessionHandler implements SessionHandler {
 
     @Override
     public void forwardRaw(ByteBuf frame) {
-        
-        
-        
-        
-        
+        // Frames the proxy does not decode still land here; the backend's
+        // player list packets must not reach the client while the network list
+        // is drawn, or the backend list and the synthetic list fight each other.
+        if (proxy.config().tab().networkList()
+                && player.connection().supports(PacketType.PLAYER_INFO_UPDATE)
+                && TabPacketFilter.isPlayerListInfo(frame,
+                        backend.connection().version(), backend.connection().state())) {
+            frame.release();
+            return;
+        }
         if (player.connection().state() != ProtocolState.PLAY) {
             frame.release();
             return;
@@ -67,7 +73,8 @@ public final class BackendPlaySessionHandler implements SessionHandler {
     @Override
     public boolean handle(pdx.dev.hypergravel.tab.TabPackets.HeaderFooter packet) {
 
-        return proxy.config().tab().enabled();
+        return proxy.config().tab().networkList()
+                && player.connection().supports(PacketType.PLAYER_INFO_UPDATE);
     }
 
     @Override
