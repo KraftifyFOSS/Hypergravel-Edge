@@ -40,21 +40,21 @@ jobs:
         run: ./gradlew --no-daemon -p examples/sample-extension jar
 
       - name: Upload runnable fat jar (JDK ${{ matrix.java }})
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: hypergravel-proxy-jdk${{ matrix.java }}
           path: hypergravel-proxy/build/libs/hypergravel-proxy-*-all.jar
           if-no-files-found: error
 
       - name: Upload sample extension (JDK ${{ matrix.java }})
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: sample-extension-jdk${{ matrix.java }}
           path: examples/sample-extension/build/libs/sample-extension-*.jar
           if-no-files-found: error
 
       - name: Upload test results (JDK ${{ matrix.java }})
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: test-results-jdk${{ matrix.java }}
