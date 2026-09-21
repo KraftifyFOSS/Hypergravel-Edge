@@ -1,4 +1,4 @@
-# HyperGravel — Architecture
+# HyperGravel - Architecture
 
 A Minecraft: Java Edition reverse proxy. Fronts every
 Paper backend behind one address, authenticates once, and moves players
@@ -52,7 +52,7 @@ Three thread groups. Nothing else runs on a Netty thread.
  │  Mojang session API │   Anything that blocks, waits on a socket we don't
  │  Discord webhooks   │   own, or touches the filesystem.
  │  config reload      │   Results are handed back with channel.eventLoop()
- │  extension tasks    │   .execute(...) — never touched cross-thread.
+ │  extension tasks    │   .execute(...) - never touched cross-thread.
  └─────────────────────┘
 ```
 
@@ -106,7 +106,7 @@ TCP accept
         │        → route: try-order from config, PreServerConnectEvent, connect
         │
         └─ ClientPlaySessionHandler ⇄ BackendPlaySessionHandler
-              steady state — see §5
+              steady state - see §5
 ```
 
 ### Login state notes
@@ -136,7 +136,7 @@ new PooledByteBufAllocator(
     /* nHeapArena  */ 0,              // nothing on-heap in the hot path
     /* nDirectArena*/ workerCount,
     /* pageSize    */ 8192,
-    /* maxOrder    */ 9,              // 4 MiB chunks — smaller than the 16 MiB
+    /* maxOrder    */ 9,              // 4 MiB chunks - smaller than the 16 MiB
                                       // default, so idle memory returns sooner
     ...);
 ```
@@ -177,7 +177,7 @@ backend ──► [frame] ──► peek packet id ──► id ∈ INSPECT set?
 `INSPECT` is a per-state, per-direction `long[]` bitset built once at startup
 from the packet registry. Membership is a shift and a mask.
 
-**What we actually inspect** — and nothing else:
+**What we actually inspect** - and nothing else:
 
 | Direction | Packet | Why |
 | --- | --- | --- |
@@ -185,17 +185,17 @@ from the packet registry. Membership is a shift and a mask.
 | ↔ | `PluginMessage` | BungeeCord channel, our `hypergravel:*` channels. |
 | ← backend | `Disconnect` | Turn a kick into a fallback instead of a dropped player. |
 | ← backend | `JoinGame` / `Respawn` | Dimension state needed for a clean switch. |
-| ← backend | `StartConfiguration` | Backend wants to reconfigure — we mirror it. |
+| ← backend | `StartConfiguration` | Backend wants to reconfigure - we mirror it. |
 | ← backend | `Transfer` | Backend-initiated move. |
 | → client | `ChatCommand` / `ChatMessage` | Command interception, Discord relay. |
 
-Everything else — movement, block changes, chunk data, entity updates, the
-overwhelming bulk of the byte volume — is forwarded as a slice.
+Everything else - movement, block changes, chunk data, entity updates, the
+overwhelming bulk of the byte volume - is forwarded as a slice.
 
 **Compression interaction.** When the client and the backend agree on the same
 compression threshold (we force this at connect time), compressed frames are
 forwarded *still compressed*. We do not inflate to inspect a packet id, because
-the id lives in the first varint of the decompressed body — so for compressed
+the id lives in the first varint of the decompressed body - so for compressed
 frames we inflate only the first few bytes with a bounded partial inflate, and
 pass the original compressed frame through if the id is uninteresting.
 
@@ -219,7 +219,7 @@ Selectable per-server; the default matches what Paper expects.
 | `none` | Backend is offline-mode and trusts the network path. |
 
 Floodgate data is prepended to the handshake address field when the player is
-Bedrock, before any of the above is applied — that ordering is what Floodgate on
+Bedrock, before any of the above is applied - that ordering is what Floodgate on
 the backend expects.
 
 Modern forwarding is what keeps us drop-in: a Paper server already configured
@@ -241,7 +241,7 @@ DOWN ──(2 successful pings + a successful test connect)──► UP
 
 When a server leaves `UP`:
 
-1. Its players are moved to `holding` — the configured limbo (`updating` :25601)
+1. Its players are moved to `holding` - the configured limbo (`updating` :25601)
    or the lobby, per the server's `on-down` policy.
 2. Each moved player records `returnTo = <server>` with a TTL.
 3. While holding, the player is a fully live connection. They see a
@@ -255,7 +255,7 @@ is dialled, the login/config handshake completes against it, and only then is
 the old connection closed and the pipeline re-pointed. If the dial fails, the
 player stays where they are. **A failed switch is always a no-op, never a kick.**
 
-On the client side the switch is a CONFIGURATION round-trip plus a respawn —
+On the client side the switch is a CONFIGURATION round-trip plus a respawn -
 the standard modern-protocol server switch, no re-login.
 
 `Transfer` (1.20.5+) is used instead where both the client and the destination
@@ -302,12 +302,12 @@ public final class HyperGravelExtension {
 }
 ```
 
-**Events** — `ProxyInitializeEvent`, `ProxyShutdownEvent`, `LoginEvent`,
+**Events** - `ProxyInitializeEvent`, `ProxyShutdownEvent`, `LoginEvent`,
 `PreServerConnectEvent` (cancellable + redirectable), `ServerConnectedEvent`,
 `DisconnectEvent`, `CommandExecuteEvent` (cancellable), `ProxyPingEvent`,
 `PluginMessageEvent`, `ServerHealthChangeEvent`.
 
-**Dispatch.** Handlers that return `void` run inline on the calling EventLoop —
+**Dispatch.** Handlers that return `void` run inline on the calling EventLoop -
 that is the fast path and most handlers use it. A handler that needs to block
 returns an `EventTask`, which suspends the event chain, runs on a virtual
 thread, and resumes on the original EventLoop. This is how a permission lookup
@@ -329,18 +329,18 @@ binding, and an optional `PermissionProvider` that LuckPerms can back.
 
 ## 10. Security
 
-- **Connection throttle** — per-IP token bucket at accept time, before any
+- **Connection throttle** - per-IP token bucket at accept time, before any
   allocation. A throttled connection is closed without a response.
-- **Concurrent caps** — per-IP and global, enforced in the boss group.
-- **Login throttle** — separate, tighter bucket keyed on the post-PROXY-protocol
+- **Concurrent caps** - per-IP and global, enforced in the boss group.
+- **Login throttle** - separate, tighter bucket keyed on the post-PROXY-protocol
   real IP.
-- **Protocol validation** — every varint is length-bounded, every string is
+- **Protocol validation** - every varint is length-bounded, every string is
   length-checked against its protocol maximum, and a frame exceeding
   `max-packet-size` closes the connection.
-- **Decompression bombs** — the inflater is bounded to the declared
+- **Decompression bombs** - the inflater is bounded to the declared
   uncompressed size, which is itself capped. A frame that inflates past its
   declaration is fatal.
-- **PROXY protocol trust list** — CIDR allowlist, default deny. Without it,
+- **PROXY protocol trust list** - CIDR allowlist, default deny. Without it,
   PROXY protocol support is an IP-spoofing primitive: anyone could claim any
   source address and defeat every per-IP limit and every IP ban.
 
@@ -362,28 +362,28 @@ binding, and an optional `PermissionProvider` that LuckPerms can back.
   once the decision is made.
 
   Every per-IP limit, log line, and forwarded address reads through
-  `MinecraftConnection.remoteAddress()`, which prefers the recovered address —
+  `MinecraftConnection.remoteAddress()`, which prefers the recovered address -
   one place that has to be right about whose IP this is.
-- **Anti-bot (Phase 3)** — Sonar-style. Before any backend is dialled, a
+- **Anti-bot (Phase 3)** - Sonar-style. Before any backend is dialled, a
   suspected bot is held in an in-proxy verification limbo and must demonstrate
   correct gravity-affected position packets and keepalive round-trips.
-- **Maintenance mode** — allowlist by UUID/permission, with a distinct MOTD.
+- **Maintenance mode** - allowlist by UUID/permission, with a distinct MOTD.
 
 ---
 
 ## 11. Ops
 
-- **Config** — TOML (night-config). Hot reload for routing, MOTD, limits, and
+- **Config** - TOML (night-config). Hot reload for routing, MOTD, limits, and
   extension config. Reload is atomic: a new immutable config object is built and
   swapped by reference. Listen addresses and forwarding secrets require a
   restart, and the reload says so instead of silently ignoring the change.
-- **Metrics** — Prometheus text exposition on a separate Netty HTTP listener:
+- **Metrics** - Prometheus text exposition on a separate Netty HTTP listener:
   player count by server, connections/s, login outcomes, per-backend ping
   latency histogram, buffer-pool usage from Netty's `PooledByteBufAllocatorMetric`,
   GC and direct-memory gauges.
-- **Health** — `/health` (process liveness) and `/ready` (at least one backend UP).
-- **Logs** — Log4j2 async loggers, structured JSON layout available for shipping.
-- **Shutdown** — SIGTERM starts a drain: stop accepting, move everyone to limbo,
+- **Health** - `/health` (process liveness) and `/ready` (at least one backend UP).
+- **Logs** - Log4j2 async loggers, structured JSON layout available for shipping.
+- **Shutdown** - SIGTERM starts a drain: stop accepting, move everyone to limbo,
   wait for the configured grace period, then close. `systemd` unit ships in
   `ops/`.
 
@@ -391,13 +391,13 @@ binding, and an optional `PermissionProvider` that LuckPerms can back.
 
 ## 12. Phasing
 
-**Phase 1 (MVP)** — accept 1.21.x, online-mode auth, route to a backend, cached
+**Phase 1 (MVP)** - accept 1.21.x, online-mode auth, route to a backend, cached
 ping + favicon, `/server`, PROXY protocol, modern forwarding.
 
-**Phase 2** — backend transfers, plugin-message channels, extension API and the
+**Phase 2** - backend transfers, plugin-message channels, extension API and the
 six ported integrations.
 
-**Phase 3** — Via layer (done), Floodgate/Bedrock, anti-bot, seamless restart, metrics.
+**Phase 3** - Via layer (done), Floodgate/Bedrock, anti-bot, seamless restart, metrics.
 
 Benchmarks close each phase: concurrent-connection ramp and a latency histogram
 against a real Paper backend, reported at p50/p99/p99.9.

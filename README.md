@@ -1,5 +1,12 @@
 # HyperGravel
 
+[![GitHub stars](https://img.shields.io/github/stars/KraftifyFOSS/Hypergravel-Edge?style=for-the-badge)](https://github.com/KraftifyFOSS/Hypergravel-Edge)
+[![GitHub forks](https://img.shields.io/github/forks/KraftifyFOSS/Hypergravel-Edge?style=for-the-badge)](https://github.com/KraftifyFOSS/Hypergravel-Edge/network/members)
+[![GitHub watchers](https://img.shields.io/github/watchers/KraftifyFOSS/Hypergravel-Edge?style=for-the-badge)](https://github.com/KraftifyFOSS/Hypergravel-Edge/watchers)
+[![GitHub issues](https://img.shields.io/github/issues/KraftifyFOSS/Hypergravel-Edge?style=for-the-badge)](https://github.com/KraftifyFOSS/Hypergravel-Edge/issues)
+[![GitHub license](https://img.shields.io/github/license/KraftifyFOSS/Hypergravel-Edge?style=for-the-badge)](https://github.com/KraftifyFOSS/Hypergravel-Edge/blob/main/LICENSE)
+[![GitHub last commit](https://img.shields.io/github/last-commit/KraftifyFOSS/Hypergravel-Edge?style=for-the-badge&label=last%20commit)](https://github.com/KraftifyFOSS/Hypergravel-Edge/commits/main)
+
 A Minecraft: Java Edition reverse proxy. Fronts every Paper backend behind one
 address, authenticates players once, and moves them between backends without a
 re-login.
@@ -11,18 +18,18 @@ reasoning behind it.
 
 ## What's built in
 
-- **Proxy core** — handshake/status/login state machines, online-mode auth,
+- **Proxy core** - handshake/status/login state machines, online-mode auth,
   zero-copy PLAY passthrough, multi-server routing with health-based fallback.
-- **Via** — ViaVersion + ViaBackwards run on the proxy, so backends keep
+- **Via** - ViaVersion + ViaBackwards run on the proxy, so backends keep
   speaking one protocol version and old clients are translated at the edge.
-- **Voice chat** — a self-contained voice relay (in `pdx.dev.hypergravel.voice`)
+- **Voice chat** - a self-contained voice relay (in `pdx.dev.hypergravel.voice`)
   with server-owned invite packets, so nobody needs a third-party voice plugin.
-- **Resource pack** — a pack builder (`pack/`) that renders the menu panels,
+- **Resource pack** - a pack builder (`pack/`) that renders the menu panels,
   tab icons, glyphs and backgrounds at runtime, plus a pack editor endpoint.
-- **Tab** — a server-driven tab list (`tab/`) with custom head icons, live
+- **Tab** - a server-driven tab list (`tab/`) with custom head icons, live
   player sections and world cards.
-- **Network chat** — cross-server chat relay over the plugin channel.
-- **Login queue** — a queue service that parks players while the destination
+- **Network chat** - cross-server chat relay over the plugin channel.
+- **Login queue** - a queue service that parks players while the destination
   backend is at capacity.
 
 ## Status
@@ -50,8 +57,8 @@ ids. Handshake/status/login/configuration ids are stable and reliable. **The PLA
 ids were written from memory and must be checked against a generated protocol
 dump.**
 
-A wrong id there does not corrupt the stream — `MinecraftDecoder` falls back to
-raw forwarding on any decode failure — but it does silently disable that
+A wrong id there does not corrupt the stream - `MinecraftDecoder` falls back to
+raw forwarding on any decode failure - but it does silently disable that
 interception. Verify rather than assume.
 
 ## Build
@@ -77,10 +84,10 @@ The argument is the config *directory*; it must contain `hypergravel.toml`. A
 
 ### Minimum config to change
 
-- `forwarding.secret` — must match `forwarding.secret` on every Paper backend.
+- `forwarding.secret` - must match `forwarding.secret` on every Paper backend.
   Generate with `head -c 32 /dev/urandom | base64`.
-- `servers.*` — the backends and their ports.
-- `proxy-protocol.trusted` — the CIDRs your port forwarders come from.
+- `servers.*` - the backends and their ports.
+- `proxy-protocol.trusted` - the CIDRs your port forwarders come from.
 
 Config errors are reported by name and stop startup rather than producing a
 half-working proxy.
@@ -131,7 +138,7 @@ Replies come back down the requesting player's own backend connection, on the
 channel the request arrived on.
 
 **Delivery caveat.** A plugin message can only ride a player's connection, so a
-`Forward` to a server with nobody on it goes nowhere — the same limitation
+`Forward` to a server with nobody on it goes nowhere - the same limitation
 BungeeCord has. To hand data to a server a player is *about to* join, send
 `Connect` and then `ForwardToPlayer`: that rides the player's own connection and
 therefore lands wherever they now are.
@@ -148,12 +155,12 @@ GET /metrics   Prometheus text exposition
 ```
 
 Bound to `127.0.0.1:9100` by default. It has no authentication and exposes
-player counts and backend topology — keep it off public interfaces.
+player counts and backend topology - keep it off public interfaces.
 
 ## Layout
 
 ```
-hypergravel-api/     extension API — events, commands, scheduler, config, permissions
+hypergravel-api/     extension API - events, commands, scheduler, config, permissions
 hypergravel-proxy/   the proxy
   protocol/     versions, packets, the id registry
   network/      Netty pipeline, codecs, session handlers
