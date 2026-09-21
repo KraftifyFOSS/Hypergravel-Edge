@@ -23,7 +23,7 @@ plugins { `java-library` }
 repositories { mavenCentral(); mavenLocal() }
 
 dependencies {
-    compileOnly("pdx.dev.hypergravel:hypergravel-api:0.1.0-SNAPSHOT")
+    compileOnly("pdx.dev.hypergravel:hypergravel-api:1.1.0-SNAPSHOT")
     // testImplementation("pdx.dev.hypergravel:hypergravel-api:...") // so tests can assert against real types
 }
 

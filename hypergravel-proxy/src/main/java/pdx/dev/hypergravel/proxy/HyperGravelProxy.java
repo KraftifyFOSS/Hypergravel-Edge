@@ -51,7 +51,7 @@ public final class HyperGravelProxy implements ProxyServer {
 
     private static final Logger LOGGER = LogManager.getLogger(HyperGravelProxy.class);
 
-    public static final String VERSION = "0.1.0";
+    public static final String VERSION = "1.1.0";
 
     private final AtomicReference<HyperGravelConfig> config = new AtomicReference<>();
     private final Path configDirectory;

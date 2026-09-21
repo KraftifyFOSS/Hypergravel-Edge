@@ -1,0 +1,91 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        java: [21, 22, 23, 24, 25]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+          cache: gradle
+
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v4
+
+      - name: Build proxy + API, run all tests
+        run: ./gradlew --no-daemon build
+
+      - name: Publish API to local repo
+        run: ./gradlew --no-daemon :hypergravel-api:publishToMavenLocal
+
+      - name: Verify sample extension still compiles against the API
+        run: ./gradlew --no-daemon -p examples/sample-extension jar
+
+      - name: Upload runnable fat jar (JDK ${{ matrix.java }})
+        uses: actions/upload-artifact@v4
+        with:
+          name: hypergravel-proxy-jdk${{ matrix.java }}
+          path: hypergravel-proxy/build/libs/hypergravel-proxy-*-all.jar
+          if-no-files-found: error
+
+      - name: Upload sample extension (JDK ${{ matrix.java }})
+        uses: actions/upload-artifact@v4
+        with:
+          name: sample-extension-jdk${{ matrix.java }}
+          path: examples/sample-extension/build/libs/sample-extension-*.jar
+          if-no-files-found: error
+
+      - name: Upload test results (JDK ${{ matrix.java }})
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-jdk${{ matrix.java }}
+          path: |
+            hypergravel-api/build/test-results/test/*.xml
+            hypergravel-proxy/build/test-results/test/*.xml
+          if-no-files-found: ignore
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+          cache: gradle
+
+      - name: Build runnable fat jar
+        run: ./gradlew --no-daemon build
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" --generate-notes || true
+          gh release upload "$GITHUB_REF_NAME" \
+            hypergravel-proxy/build/libs/hypergravel-proxy-*-all.jar --clobber
