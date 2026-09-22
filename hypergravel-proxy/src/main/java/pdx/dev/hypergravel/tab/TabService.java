@@ -11,13 +11,19 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import io.netty.buffer.ByteBuf;
+
 import pdx.dev.hypergravel.api.server.RegisteredServer;
 import pdx.dev.hypergravel.proxy.HyperGravelProxy;
 import pdx.dev.hypergravel.proxy.backend.HyperGravelServer;
+import pdx.dev.hypergravel.proxy.network.codec.TabWire;
 import pdx.dev.hypergravel.proxy.player.ConnectedPlayer;
+import pdx.dev.hypergravel.proxy.protocol.Packet;
+import pdx.dev.hypergravel.proxy.protocol.PacketDirection;
 import pdx.dev.hypergravel.proxy.protocol.PacketType;
 import pdx.dev.hypergravel.proxy.protocol.ProtocolState;
 import pdx.dev.hypergravel.proxy.protocol.packet.GameProfile;
+import pdx.dev.hypergravel.via.ViaSupport;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -205,12 +211,34 @@ public final class TabService {
 
     private boolean canReceive(ConnectedPlayer player) {
         var connection = player.connection();
-        
-        
+
+
         return connection.active()
                 && connection.state() == ProtocolState.PLAY
                 && player.pendingSwitchBackend() == null
-                && connection.supports(PacketType.PLAYER_INFO_UPDATE);
+                && reaches(player);
+    }
+
+    public static boolean reaches(ConnectedPlayer player) {
+        if (player.connection().supports(PacketType.PLAYER_INFO_UPDATE)) {
+            return true;
+        }
+        return player.version().nativelySupported()
+                && ViaSupport.enabled()
+                && !player.version().equals(ViaSupport.serverProtocolVersion());
+    }
+
+    private void send(ConnectedPlayer player, Packet packet, PacketType type) {
+        var connection = player.connection();
+        if (connection.supports(type)) {
+            connection.write(packet);
+            return;
+        }
+        ByteBuf raw = TabWire.encodeRaw(packet, ProtocolState.PLAY, PacketDirection.CLIENTBOUND,
+                ViaSupport.serverProtocolVersion(), connection.channel().alloc());
+        if (raw != null) {
+            connection.write(raw);
+        }
     }
 
     private void push(ConnectedPlayer player, List<Row> rows, List<UUID> online) {
@@ -229,8 +257,8 @@ public final class TabService {
             for (UUID uuid : online) {
                 hidden.add(TabPackets.Entry.listedFlag(uuid, false));
             }
-            player.connection().write(new TabPackets.PlayerInfoUpdate(
-                    TabPackets.ACTION_UPDATE_LISTED, hidden));
+            send(player, new TabPackets.PlayerInfoUpdate(
+                    TabPackets.ACTION_UPDATE_LISTED, hidden), PacketType.PLAYER_INFO_UPDATE);
         }
 
         Map<UUID, Row> previous = sentRows.computeIfAbsent(player.uuid(), key -> new HashMap<>());
@@ -258,27 +286,29 @@ public final class TabService {
         }
 
         if (!removed.isEmpty()) {
-            player.connection().write(new TabPackets.PlayerInfoRemove(removed));
+            send(player, new TabPackets.PlayerInfoRemove(removed),
+                    PacketType.PLAYER_INFO_REMOVE);
         }
         if (!added.isEmpty()) {
-            player.connection().write(new TabPackets.PlayerInfoUpdate(
+            send(player, new TabPackets.PlayerInfoUpdate(
                     TabPackets.ACTION_ADD_PLAYER
                             | TabPackets.ACTION_UPDATE_GAME_MODE
                             | TabPackets.ACTION_UPDATE_LISTED
                             | TabPackets.ACTION_UPDATE_LATENCY
                             | TabPackets.ACTION_UPDATE_DISPLAY_NAME,
-                    added));
+                    added), PacketType.PLAYER_INFO_UPDATE);
         }
         if (!changed.isEmpty()) {
-            player.connection().write(new TabPackets.PlayerInfoUpdate(
+            send(player, new TabPackets.PlayerInfoUpdate(
                     TabPackets.ACTION_UPDATE_LATENCY | TabPackets.ACTION_UPDATE_DISPLAY_NAME,
-                    changed));
+                    changed), PacketType.PLAYER_INFO_UPDATE);
         }
 
         previous.clear();
         previous.putAll(current);
 
-        player.connection().write(new TabPackets.HeaderFooter(header(player), footer(player)));
+        send(player, new TabPackets.HeaderFooter(header(player), footer(player)),
+                PacketType.TAB_LIST);
         player.connection().flush();
     }
 
@@ -360,7 +390,7 @@ public final class TabService {
         int ping = (int) Math.max(0, player.pingMillis());
 
         if (iconMode == IconMode.NONE) {
-            return new Row(sortKey, null, name, ping, propertiesFor(null));
+            return new Row(sortKey, null, name, ping, player.profile().properties());
         }
 
         char face = faces == null ? 0 : faces.glyphFor(player.username());

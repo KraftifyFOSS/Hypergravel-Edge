@@ -137,6 +137,18 @@ public final class ViaSupport {
         return supported.isEmpty() ? null : supported.first().getName();
     }
 
+    public static pdx.dev.hypergravel.proxy.protocol.ProtocolVersion serverProtocolVersion() {
+        if (enabled && serverVersion != null) {
+            pdx.dev.hypergravel.proxy.protocol.ProtocolVersion ours =
+                    pdx.dev.hypergravel.proxy.protocol.ProtocolVersion
+                            .fromId(serverVersion.getVersion());
+            if (ours != pdx.dev.hypergravel.proxy.protocol.ProtocolVersion.UNKNOWN) {
+                return ours;
+            }
+        }
+        return pdx.dev.hypergravel.proxy.protocol.ProtocolVersion.MAXIMUM_NATIVE;
+    }
+
     private static String supportedRange() {
         SortedSet<ProtocolVersion> supported = supportedVersions();
         if (supported.isEmpty()) {

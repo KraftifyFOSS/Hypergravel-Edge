@@ -31,8 +31,10 @@ multi-version 1.9+ guarantee.
 - Tab now behaves like normal Minecraft by default: the backend player list is
   forwarded untouched. The server-driven network list is opt-in via
   `[tab] network-list = true` (the legacy `enabled` key is still honored). When
-  the network list is on, backend player-info packets are dropped so the two
-  lists never collide.
+  the network list is on, backend rows are hidden rather than deleted, so world
+  skins keep working, and the board is also emitted in backend wire format so
+  Via-translated clients see it. Player rows keep real skins when
+  `[tab] icons = "none"`.
 
 ### Fixed
 - Dependency ordering in the extension loader: stable Kahn ordering is no

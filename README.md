@@ -45,7 +45,9 @@ reasoning behind it.
 * **Tab** - the tab behaves like normal Minecraft by default (the backend
   list is forwarded untouched); an opt-in server-driven network list (`tab/`)
   with custom head icons, live player sections and world cards is available
-  via `[tab] network-list = true`.
+  via `[tab] network-list = true`. With the list on, backend rows are hidden,
+  never deleted, so world skins keep working, and the board also reaches
+  Via-translated clients.
 * **Network chat** - cross-server chat relay over the plugin channel.
 * **Login queue** - a queue service that parks players while the destination
   backend is at capacity.
