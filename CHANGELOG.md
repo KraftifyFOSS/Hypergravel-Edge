@@ -35,6 +35,10 @@ multi-version 1.9+ guarantee.
   skins keep working, and the board is also emitted in backend wire format so
   Via-translated clients see it. Player rows keep real skins when
   `[tab] icons = "none"`.
+- Tab heads on strict clients (26.2): the proxy now rewrites backend
+  add-player rows with the Mojang properties it verified at login, after a
+  capture proved a backend emitting mismatched value/signature pairs, which
+  newer clients reject with blank heads while older ones render them.
 
 ### Fixed
 - Dependency ordering in the extension loader: stable Kahn ordering is no

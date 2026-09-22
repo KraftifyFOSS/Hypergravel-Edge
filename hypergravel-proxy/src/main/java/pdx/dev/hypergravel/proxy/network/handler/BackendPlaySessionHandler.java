@@ -30,22 +30,48 @@ public final class BackendPlaySessionHandler implements SessionHandler {
 
     @Override
     public void forwardRaw(ByteBuf frame) {
-        // The backend's player list frames pass through untouched. While the
-        // network list is drawn they stay invisible because TabService keeps
-        // every real entry unlisted; deleting them instead would also delete
-        // the profiles the client needs for world skins.
+        // The backend's player list frames pass through, except the profile
+        // properties on add-player rows, which are replaced with the Mojang
+        // properties the proxy verified at login. Backends have been seen to
+        // emit mismatched value/signature pairs, which strict clients reject
+        // with blank tab heads while lenient ones render them anyway.
         if (player.connection().state() != ProtocolState.PLAY) {
             frame.release();
             return;
         }
+        ByteBuf rewritten = rewritePlayerInfo(frame);
+        ByteBuf outgoing = rewritten != null ? rewritten : frame;
+        if (rewritten != null) {
+            frame.release();
+        }
         if (!backend.active() || !player.connection().active()) {
 
-            frame.release();
+            outgoing.release();
             return;
         }
 
-        player.connection().channel().write(frame,
+        player.connection().channel().write(outgoing,
                 player.connection().channel().voidPromise());
+    }
+
+    private ByteBuf rewritePlayerInfo(ByteBuf frame) {
+        if (backend.connection().state() != ProtocolState.PLAY) {
+            return null;
+        }
+        int updateId = pdx.dev.hypergravel.proxy.protocol.StateRegistry
+                .of(ProtocolState.PLAY)
+                .direction(pdx.dev.hypergravel.proxy.protocol.PacketDirection.CLIENTBOUND)
+                .forVersion(pdx.dev.hypergravel.via.ViaSupport.serverProtocolVersion())
+                .idOf(pdx.dev.hypergravel.proxy.protocol.PacketType.PLAYER_INFO_UPDATE);
+        if (updateId < 0) {
+            return null;
+        }
+        return pdx.dev.hypergravel.tab.PlayerInfoRewriter.rewriteAdd(frame, updateId,
+                uuid -> proxy.playerRegistry().byUuid(uuid)
+                        .map(connected -> connected.profile().properties())
+                        .filter(properties -> properties.length > 0)
+                        .orElse(null),
+                player.connection().channel().alloc());
     }
 
     @Override
