@@ -1,6 +1,6 @@
 [versions]
 netty = "4.2.16.Final"
-adventure = "4.26.1"
+adventure = "5.2.0"
 log4j = "2.26.1"
 gson = "2.14.0"
 nightconfig = "3.9.0"
